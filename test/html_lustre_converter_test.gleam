@@ -199,3 +199,54 @@ pub fn pre_whitespace_test() {
 )",
   )
 }
+
+pub fn svg_test() {
+  "<svg xmlns=\"http://www.w3.org/2000/svg\">
+  <clipPath id=\"clip-path\">
+    <circle cx=\"100\" cy=\"100\" r=\"80\" />
+  </clipPath>
+  <g clip-path=\"url(#clip-path)\">
+    <path d=\"M10 10 H 190 V 190 H 10 Z\" fill=\"blue\" stroke=\"red\" stroke-width=\"5\"/>
+    <path d=\"M10 190 L 190 10\" fill=\"none\" stroke=\"red\" stroke-width=\"5\"/>
+  </g>
+  <circle cx=\"100\" cy=\"100\" r=\"80\" fill=\"none\" stroke=\"black\" stroke-width=\"2\" />
+</svg>
+"
+  |> html_lustre_converter.convert
+  |> should.equal(
+    "html.svg(
+  [attribute(\"xmlns\", \"http://www.w3.org/2000/svg\")],
+  [
+    svg.clip_path([attribute.id(\"clip-path\")], [
+      svg.circle([
+        attribute(\"r\", \"80\"),
+        attribute(\"cy\", \"100\"),
+        attribute(\"cx\", \"100\"),
+      ]),
+    ]),
+    svg.g([attribute(\"clip-path\", \"url(#clip-path)\")], [
+      svg.path([
+        attribute(\"stroke-width\", \"5\"),
+        attribute(\"stroke\", \"red\"),
+        attribute(\"fill\", \"blue\"),
+        attribute(\"d\", \"M10 10 H 190 V 190 H 10 Z\"),
+      ]),
+      svg.path([
+        attribute(\"stroke-width\", \"5\"),
+        attribute(\"stroke\", \"red\"),
+        attribute(\"fill\", \"none\"),
+        attribute(\"d\", \"M10 190 L 190 10\"),
+      ]),
+    ]),
+    svg.circle([
+      attribute(\"stroke-width\", \"2\"),
+      attribute(\"stroke\", \"black\"),
+      attribute(\"fill\", \"none\"),
+      attribute(\"r\", \"80\"),
+      attribute(\"cy\", \"100\"),
+      attribute(\"cx\", \"100\"),
+    ]),
+  ],
+)",
+  )
+}
